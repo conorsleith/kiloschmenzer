@@ -7,6 +7,7 @@ class KiloschmenzerField extends WatchUi.DataField {
 
     hidden var mValue as Numeric;
     private var _fitContributor as KschmFitContributor;
+    private var _labelString as Text = "kschm_label";
 
     function initialize() {
         _fitContributor = new KschmFitContributor(self);
@@ -38,13 +39,13 @@ class KiloschmenzerField extends WatchUi.DataField {
         // Use the generic, centered layout
         } else {
             View.setLayout(Rez.Layouts.MainLayout(dc));
-            var labelView = View.findDrawableById("label") as Text;
+            var labelView = View.findDrawableById(_labelString) as Text;
             labelView.locY = labelView.locY - 16;
             var valueView = View.findDrawableById("value") as Text;
             valueView.locY = valueView.locY + 7;
         }
 
-        (View.findDrawableById("label") as Text).setText(Rez.Strings.label);
+        (View.findDrawableById("kschm_label") as Text).setText(Rez.Strings.label);
     }
 
     // The given info object contains all the current workout information.
@@ -114,4 +115,15 @@ class KiloschmenzerField extends WatchUi.DataField {
 
 }
 
-// .32 .13 12
+class LapKiloschmenzerview extends KiloschmenzerView {
+
+    hidden var mValue as Numeric;
+    private var _fitContributor as LapKschmFitContributor;
+    private var _labelString as Text = "lap_kschm_label";
+
+    function initialize() {
+        _fitContributor = new LapKschmFitContributor(self);
+        DataField.initialize();
+        mValue = 0.0f;
+    }
+}

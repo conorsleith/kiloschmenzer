@@ -10,13 +10,6 @@ import Toybox.Activity;
 import Toybox.System;
 
 class KschmFitContributor {
-    // Field ids
-    private enum FieldId {
-        FIELD_SESSION_KILOSCHMENZERS,
-        FIELD_LAP_KILOSCHMENZERS,
-        FIELD_SESSION_KILOSCHMENZER_PACE,
-        FIELD_LAP_KILOSCHMENZER_PACE
-    }
 
     // Variables for computing averages
     private var _sessionDistance as Float = 0.0;
@@ -37,24 +30,27 @@ class KschmFitContributor {
     private var _lapKschmPaceField as Field;
 
     public var lapKschm as Float?;
-    public var lapKschmPace as Number?;
+    public var lapKschmPace as String?;
     public var sessionKschm as Float?;
-    public var sessionKschmPace as Number?;
+    public var sessionKschmPace as String?;
 
     //! Constructor
     //! @param dataField Data field to use to create fields
     public function initialize(dataField as KiloschmenzerQuadrantView) {
-        _sessionKschmField = dataField.createField("Session Kiloschmenzers", FIELD_SESSION_KILOSCHMENZERS, FitContributor.DATA_TYPE_FLOAT, { :nativeNum=>0.0, :mesgType=>FitContributor.MESG_TYPE_SESSION, :units=>"kiloschmenzers" });
-        _sessionKschmPaceField = dataField.createField("Session Kiloschmenzer Pace", FIELD_SESSION_KILOSCHMENZER_PACE , FitContributor.DATA_TYPE_SINT32, { :nativeNum=>0.0, :mesgType=>FitContributor.MESG_TYPE_SESSION, :units=>"s/Kschm" });
-        _lapKschmPaceField = dataField.createField("Lap Kiloschmenzer Pace", FIELD_LAP_KILOSCHMENZER_PACE, FitContributor.DATA_TYPE_SINT32, { :nativeNum=>0.0, :mesgType=>FitContributor.MESG_TYPE_LAP, :units=>"s/Kschm" });
-        _lapKschmField = dataField.createField("Lap Kiloschmenzers", FIELD_LAP_KILOSCHMENZERS, FitContributor.DATA_TYPE_FLOAT, { :nativeNum=>0.0, :mesgType=>FitContributor.MESG_TYPE_LAP, :units=>"Kiloschmenzers" });
+        _sessionKschmField = dataField.createField("Session Kiloschmenzers", 0, FitContributor.DATA_TYPE_FLOAT, { :nativeNum=>0.0, :mesgType=>FitContributor.MESG_TYPE_SESSION, :units=>"kiloschmenzers" });
+        _sessionKschmPaceField = dataField.createField("Session Kiloschmenzer Pace", 1 , FitContributor.DATA_TYPE_STRING, { :count=>10, :nativeNum=>0.0, :mesgType=>FitContributor.MESG_TYPE_SESSION, :units=>"s/Kschm" });
+        _lapKschmPaceField = dataField.createField("Lap Kiloschmenzer Pace", 2, FitContributor.DATA_TYPE_STRING, { :count=>10, :nativeNum=>0.0, :mesgType=>FitContributor.MESG_TYPE_LAP, :units=>"s/Kschm" });
+        _lapKschmField = dataField.createField("Lap Kiloschmenzers", 3, FitContributor.DATA_TYPE_FLOAT, { :nativeNum=>0.0, :mesgType=>FitContributor.MESG_TYPE_LAP, :units=>"Kiloschmenzers" });
 
-        _sessionKschmField.setData(0.0);
-        _lapKschmField.setData(0.0);
-        _sessionKschmPaceField.setData(0.0);
-        _lapKschmPaceField.setData(0.0);
-        lapKschm = 0.0;
+        // _sessionKschmField.setData(0.0);
+        // _lapKschmField.setData(0.0);
+        // _sessionKschmPaceField.setData(0.0);
+        // _lapKschmPaceField.setData(0.0);
         sessionKschm = 0.0;
+        lapKschm = 0.0;
+        sessionKschmPace = "--:--";
+        lapKschmPace = "--:--";
+        
     }
 
 
@@ -71,28 +67,27 @@ class KschmFitContributor {
             _lapVert = _sessionVert - _sumPreviousLapsVert;
 
             lapKschm = computeKschm(_lapDistance, _lapVert) as Float;
+            _lapKschmField.setData(lapKschm);
             sessionKschm = computeKschm(_sessionDistance, _sessionVert) as Float;
+            _sessionKschmField.setData(sessionKschm);
+            
+            var secsPerKschm;
 
             if (lapKschm != 0 && lapKschm != null) {
-                lapKschmPace = ((_lapElapsedMs / 1000) / lapKschm).toNumber(); // seconds per kiloschmenzer
+                secsPerKschm = ((_lapElapsedMs / 1000) / lapKschm).toNumber(); // seconds per kiloschmenzer
+                lapKschmPace = toMinSec(secsPerKschm);
+                _lapKschmPaceField.setData(lapKschmPace);
             } else {
-                lapKschmPace = null;
+                lapKschmPace = "--:--";
             }
 
             if (sessionKschm != 0 && sessionKschm != null) {
-                var printer = "Elapsed S: $1$; Elapsed distance: $3$; Session Kschm: $2$; Session vert: $4$;";
-                printer = Lang.format(printer, [_sessionElapsedMs/1000, sessionKschm, _sessionDistance/1000, _sessionVert]);
-
-                System.println(printer);
-                sessionKschmPace = ((_sessionElapsedMs / 1000) / sessionKschm).toNumber(); // seconds per kiloschmenzer
+                secsPerKschm = ((_sessionElapsedMs / 1000) / sessionKschm).toNumber(); // seconds per kiloschmenzer
+                sessionKschmPace = toMinSec(secsPerKschm);
+                _sessionKschmPaceField.setData(sessionKschmPace);
             } else{
-                sessionKschmPace = null;
+                sessionKschmPace = "--:--";
             }
-
-            _sessionKschmField.setData(sessionKschm);
-            _lapKschmField.setData(lapKschm);
-            if (sessionKschmPace != null) {_sessionKschmPaceField.setData(sessionKschmPace);}
-            if (lapKschmPace != null) {_lapKschmPaceField.setData(lapKschmPace);}
         }
     }
 
@@ -110,6 +105,16 @@ class KschmFitContributor {
     //! @return Fixed value
     private function toFixed(value as Numeric, scale as Number) as Number {
         return ((value * scale) + 0.5).toNumber();
+    }
+
+    function toMinSec(secs as Number?) {
+        if (secs != null && secs > 0) {
+            var min = secs / 60;
+            var sec = secs % 60;
+            return min.format("%01d")+":"+sec.format("%02d");
+        } else {
+            return "--:--";
+        }
     }
 
     //! Set whether the timer is running

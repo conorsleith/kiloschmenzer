@@ -85,9 +85,9 @@ class KiloschmenzerQuadrantView extends Ui.DataField {
         dc.drawText(_width/2, _shoulderLabelY, _labelsFont, _elapsedKschmsLabel, Graphics.TEXT_JUSTIFY_CENTER);
         dc.drawText(_width/2, _shoulderDataY, _dataFont, sessionKschm.format("%.2f"), Graphics.TEXT_JUSTIFY_CENTER);
         dc.drawText(_width/2, _hipLabelY, _labelsFont, _kschmPaceLabel, Graphics.TEXT_JUSTIFY_CENTER);
-        dc.drawText(_width/2, _hipDataY, _dataFont, toMinSec(sessionKschmPace), Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(_width/2, _hipDataY, _dataFont, sessionKschmPace, Graphics.TEXT_JUSTIFY_CENTER);
         dc.drawText(_width/2, _footLabelY, _labelsFont, _lapKschmPaceLabel, Graphics.TEXT_JUSTIFY_CENTER);
-        dc.drawText(_width/2, _footDataY, _dataFont, toMinSec(lapKschmPace), Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(_width/2, _footDataY, _dataFont, lapKschmPace, Graphics.TEXT_JUSTIFY_CENTER);
     }
 
     public function compute(info as Activity.Info) as Void {
@@ -124,13 +124,4 @@ class KiloschmenzerQuadrantView extends Ui.DataField {
         _fitContributor.onTimerReset();
     }
 
-    function toMinSec(secs as Number?) {
-        if (secs != null && secs > 0) {
-            var min = secs / 60;
-            var sec = secs % 60;
-            return min.format("%01d")+":"+sec.format("%02d");
-        } else {
-            return "--:--";
-        }
-    }
 }

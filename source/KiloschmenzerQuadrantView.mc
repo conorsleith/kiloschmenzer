@@ -119,6 +119,11 @@ class KiloschmenzerQuadrantView extends Ui.DataField {
         _fitContributor.onTimerLap();
     }
 
+    //! Handle a workout step event
+    public function onWorkoutStepComplete() as Void {
+        _fitContributor.onTimerLap();
+    }
+
     //! Handle the current activity ending
     public function onTimerReset() as Void {
         _fitContributor.onTimerReset();

@@ -1,5 +1,13 @@
 <strings>
     <string id="AppName">Kiloschmenzer</string>
-
-    <string id="label">Kiloschmenzers</string>
+    <string id="kschm_label">Kschm</string>
+    <string id="lap_kschm_label">Lap Kschm</string>
+    <string id="kschm_pace_label">Avg Kschm Pace</string>
+    <string id="lap_kschm_pace_label">Lap Avg Kschm Pace</string>
+    <string id="kiloschmenzers_label">Total Kiloschmenzers</string>
+    <string id="kiloschmenzers_units">Kschm</string>
+    <string id="session_kiloschmenzer_pace_label">Average Pace (Kschm)</string>
+    <string id="kiloschmenzer_pace_units"> /Kschm</string>
+    <string id="lap_kiloschmenzer_pace_label">Lap Average Pace (Kschm)</string>
+    <string id="lap_kiloschmenzers_label">Lap Kiloschmenzers</string>
 </strings>

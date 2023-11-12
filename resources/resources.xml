@@ -1,0 +1,33 @@
+<resources>
+    <fitContributions>
+        <fitField id="0"
+        displayInActivitySummary="true"
+        sortOrder = "0"
+        precision="2"
+        dataLabel="@Strings.kiloschmenzers_label"
+        unitLabel="@Strings.kiloschmenzers_units" />
+
+        <fitField id="1"
+        displayInActivitySummary="true"
+        sortOrder = "1"
+        precision="2"
+        dataLabel="@Strings.session_kiloschmenzer_pace_label"
+        unitLabel="@Strings.kiloschmenzer_pace_units" />
+
+        <fitField id="2"
+        displayInChart="false"
+        sortOrder = "2"
+        precision="2"
+        displayInActivityLaps="true"
+        dataLabel="@Strings.lap_kiloschmenzer_pace_label"
+        unitLabel="@Strings.kiloschmenzer_pace_units" />
+
+        <fitField id="3"
+        displayInChart="false"
+        sortOrder = "3"
+        precision="2"
+        displayInActivityLaps="true"
+        dataLabel="@Strings.lap_kiloschmenzers_label"
+        unitLabel="@Strings.kiloschmenzers_units" />
+    </fitContributions>
+</resources>

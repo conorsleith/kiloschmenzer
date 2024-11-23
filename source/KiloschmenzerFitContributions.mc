@@ -69,10 +69,10 @@ class KschmFitContributor {
     //! Update data and fields
     //! @param sensor The ANT channel and data
     public function compute(info as Activity.Info) as Void {
-        if (_timerRunning && info.elapsedDistance != null && info.elapsedTime != null && info.totalAscent != null) {
+        if (_timerRunning && info.elapsedDistance != null && info.timerTime != null && info.totalAscent != null) {
             // Update lap/session data and record counts
-            _sessionElapsedMs = info.elapsedTime;
-            _lapElapsedMs = _sessionElapsedMs - _sumPreviousLapsMs;
+            _sessionTimerMs = info.timerTime;
+            _lapTimerMs = _sessionTimerMs - _sumPreviousLapsMs;
             _sessionDistance = info.elapsedDistance;
             _lapDistance = _sessionDistance - _sumPreviousLapsDistance;
             _sessionVert = info.totalAscent;
@@ -156,5 +156,7 @@ class KschmFitContributor {
         _lapVert = 0;
         _lapDistance = 0.0;
     }
+
+    
 
 }

@@ -74,19 +74,11 @@ class KschmFitContributor {
         if (_timerRunning && info.elapsedDistance != null && info.totalAscent != null) {
             // Update lap/session data and record counts
             _sessionTimerMs = info.elapsedTime - _totalPausedTime;
-            // System.println(_totalPausedTime);
             _lapTimerMs = _sessionTimerMs - _sumPreviousLapsMs -1;
             _sessionDistance = info.elapsedDistance;
             _lapDistance = _sessionDistance - _sumPreviousLapsDistance;
             _sessionVert = info.totalAscent;
             _lapVert = _sessionVert - _sumPreviousLapsVert;
-            // System.println("_sessionTimerMs: " + _sessionTimerMs.format("%02d"));
-            // System.println("_lapTimerMs: " + _lapTimerMs.format("%02d"));
-            // System.println("_sessionDistance: " + _sessionDistance.format("%02d"));
-            // System.println("_sumPreviousLapsDistance: " + _sumPreviousLapsDistance.format("%02d"));
-            // System.println("_lapDistance: " + _lapDistance.format("%02d"));
-            // System.println("_sessionVert: " + _sessionVert.format("%02d"));
-            // System.println("_lapVert: " + _lapVert.format("%02d"));
     
             lapKschm = computeKschm(_lapDistance, _lapVert) * _conversionFactor as Float;
             _lapKschmField.setData(lapKschm);
@@ -99,9 +91,7 @@ class KschmFitContributor {
                 secsPerKschm = ((_lapTimerMs / 1000.0) / lapKschm);//.toNumber(); // seconds per kiloschmenzer
                 lapKschmPace = toMinSec(secsPerKschm.toNumber());
                 _lapKschmPaceField.setData(lapKschmPace);
-                // System.println(lapKschmPace);
             } else {
-                // System.println("lapkschm is 0 or null (allegedly)");
                 lapKschmPace = "--:--";
             }
 
@@ -134,7 +124,6 @@ class KschmFitContributor {
             var sec = secs % 60;
             return min.format("%01d")+":"+sec.format("%02d");
         } else {
-            // System.println("toMinSecs returns dashes");
             return "--:--";
         }
     }

@@ -12,8 +12,11 @@ class Background extends WatchUi.Drawable {
         };
 
         Drawable.initialize(dictionary);
-
-        mColor = Graphics.COLOR_WHITE;
+        if (System.getDeviceSettings().requiresBurnInProtection) {
+            mColor = Graphics.COLOR_BLACK;
+        } else {
+            mColor = Graphics.COLOR_WHITE;
+        }
     }
 
     function setColor(color as ColorValue) as Void {

@@ -15,10 +15,10 @@ class KschmFitContributor {
 
     // Variables for computing averages
     private var _sessionDistance as Float = 0.0;
-    private var _sessionElapsedMs as Number = 0;
+    private var _sessionTimerMs as Number = 0;
     private var _sessionVert as Number = 0;
     private var _lapDistance as Float = 0.0;
-    private var _lapElapsedMs as Number = 0;
+    private var _lapTimerMs as Number = 0;
     private var _lapVert as Number = 0;
     private var _sumPreviousLapsDistance as Float = 0.0;
     private var _sumPreviousLapsMs as Number = 0;
@@ -30,8 +30,10 @@ class KschmFitContributor {
     private var _lapKschmField as Field;
     private var _sessionKschmPaceField as Field;
     private var _lapKschmPaceField as Field;
-
     private var _conversionFactor as Float;
+
+    private var _timeAtPause as Number = 0;
+    private var _totalPausedTime as Number = 0;
 
     public var lapKschm as Float?;
     public var lapKschmPace as String?;
@@ -69,14 +71,22 @@ class KschmFitContributor {
     //! Update data and fields
     //! @param sensor The ANT channel and data
     public function compute(info as Activity.Info) as Void {
-        if (_timerRunning && info.elapsedDistance != null && info.timerTime != null && info.totalAscent != null) {
+        if (_timerRunning && info.elapsedDistance != null && info.totalAscent != null) {
             // Update lap/session data and record counts
-            _sessionTimerMs = info.timerTime;
-            _lapTimerMs = _sessionTimerMs - _sumPreviousLapsMs;
+            _sessionTimerMs = info.elapsedTime - _totalPausedTime;
+            // System.println(_totalPausedTime);
+            _lapTimerMs = _sessionTimerMs - _sumPreviousLapsMs -1;
             _sessionDistance = info.elapsedDistance;
             _lapDistance = _sessionDistance - _sumPreviousLapsDistance;
             _sessionVert = info.totalAscent;
             _lapVert = _sessionVert - _sumPreviousLapsVert;
+            // System.println("_sessionTimerMs: " + _sessionTimerMs.format("%02d"));
+            // System.println("_lapTimerMs: " + _lapTimerMs.format("%02d"));
+            // System.println("_sessionDistance: " + _sessionDistance.format("%02d"));
+            // System.println("_sumPreviousLapsDistance: " + _sumPreviousLapsDistance.format("%02d"));
+            // System.println("_lapDistance: " + _lapDistance.format("%02d"));
+            // System.println("_sessionVert: " + _sessionVert.format("%02d"));
+            // System.println("_lapVert: " + _lapVert.format("%02d"));
     
             lapKschm = computeKschm(_lapDistance, _lapVert) * _conversionFactor as Float;
             _lapKschmField.setData(lapKschm);
@@ -86,16 +96,18 @@ class KschmFitContributor {
             var secsPerKschm;
 
             if (lapKschm != 0 && lapKschm != null) {
-                secsPerKschm = ((_lapElapsedMs / 1000) / lapKschm).toNumber(); // seconds per kiloschmenzer
-                lapKschmPace = toMinSec(secsPerKschm);
+                secsPerKschm = ((_lapTimerMs / 1000.0) / lapKschm);//.toNumber(); // seconds per kiloschmenzer
+                lapKschmPace = toMinSec(secsPerKschm.toNumber());
                 _lapKschmPaceField.setData(lapKschmPace);
+                // System.println(lapKschmPace);
             } else {
+                // System.println("lapkschm is 0 or null (allegedly)");
                 lapKschmPace = "--:--";
             }
 
             if (sessionKschm != 0 && sessionKschm != null) {
-                secsPerKschm = ((_sessionElapsedMs / 1000) / sessionKschm).toNumber(); // seconds per kiloschmenzer
-                sessionKschmPace = toMinSec(secsPerKschm);
+                secsPerKschm = ((_sessionTimerMs / 1000.0) / sessionKschm);
+                sessionKschmPace = toMinSec(secsPerKschm.toNumber());
                 _sessionKschmPaceField.setData(sessionKschmPace);
             } else{
                 sessionKschmPace = "--:--";
@@ -122,6 +134,7 @@ class KschmFitContributor {
             var sec = secs % 60;
             return min.format("%01d")+":"+sec.format("%02d");
         } else {
+            // System.println("toMinSecs returns dashes");
             return "--:--";
         }
     }
@@ -139,10 +152,10 @@ class KschmFitContributor {
             return;
         }
 
-        _sumPreviousLapsMs = info.elapsedTime;
+        _sumPreviousLapsMs = _sessionTimerMs;
         _sumPreviousLapsVert = info.totalAscent;
         _sumPreviousLapsDistance = info.elapsedDistance;
-        _lapElapsedMs = 0;
+        _lapTimerMs = 0;
         _lapVert = 0;
         _lapDistance = 0.0;
     }
@@ -152,9 +165,19 @@ class KschmFitContributor {
         _sumPreviousLapsMs = 0;
         _sumPreviousLapsVert = 0;
         _sumPreviousLapsDistance = 0.0;
-        _lapElapsedMs = 0;
+        _lapTimerMs = 0;
         _lapVert = 0;
         _lapDistance = 0.0;
+    }
+
+    public function onTimerPause() as Void {
+        _timeAtPause = Activity.getActivityInfo().elapsedTime;
+        setTimerRunning(false);
+    }
+
+    public function onTimerResume() as Void {
+        _totalPausedTime += (Activity.getActivityInfo().elapsedTime - _timeAtPause);
+        setTimerRunning(true);
     }
 
     

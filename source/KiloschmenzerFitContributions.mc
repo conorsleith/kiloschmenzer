@@ -71,10 +71,10 @@ class KschmFitContributor {
     //! Update data and fields
     //! @param sensor The ANT channel and data
     public function compute(info as Activity.Info) as Void {
-        if (_timerRunning && info.elapsedDistance != null && info.totalAscent != null) {
+        if (_timerRunning && info.elapsedDistance != null && info.elapsedTime != null && info.totalAscent != null) {
             // Update lap/session data and record counts
-            _sessionTimerMs = info.elapsedTime - _totalPausedTime;
-            _lapTimerMs = _sessionTimerMs - _sumPreviousLapsMs -1;
+            _sessionTimerMs = info.timerTime;
+            _lapTimerMs = _sessionTimerMs - _sumPreviousLapsMs - 1;
             _sessionDistance = info.elapsedDistance;
             _lapDistance = _sessionDistance - _sumPreviousLapsDistance;
             _sessionVert = info.totalAscent;
@@ -91,6 +91,7 @@ class KschmFitContributor {
                 secsPerKschm = ((_lapTimerMs / 1000.0) / lapKschm);//.toNumber(); // seconds per kiloschmenzer
                 lapKschmPace = toMinSec(secsPerKschm.toNumber());
                 _lapKschmPaceField.setData(lapKschmPace);
+
             } else {
                 lapKschmPace = "--:--";
             }
@@ -160,12 +161,10 @@ class KschmFitContributor {
     }
 
     public function onTimerPause() as Void {
-        _timeAtPause = Activity.getActivityInfo().elapsedTime;
         setTimerRunning(false);
     }
 
     public function onTimerResume() as Void {
-        _totalPausedTime += (Activity.getActivityInfo().elapsedTime - _timeAtPause);
         setTimerRunning(true);
     }
 

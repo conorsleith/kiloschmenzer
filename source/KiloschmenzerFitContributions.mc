@@ -32,9 +32,6 @@ class KschmFitContributor {
     private var _lapKschmPaceField as Field;
     private var _conversionFactor as Float;
 
-    private var _timeAtPause as Number = 0;
-    private var _totalPausedTime as Number = 0;
-
     public var lapKschm as Float?;
     public var lapKschmPace as String?;
     public var sessionKschm as Float?;

@@ -1,3 +1,5 @@
+// Conor Sleith 
+
 import Toybox.Application;
 import Toybox.Lang;
 import Toybox.WatchUi;

@@ -33,8 +33,18 @@ class KiloschmenzerQuadrantView extends Ui.DataField {
     private var _lapKschmsLabel = "Lap Kschm";
     private var _kschmPaceLabel = "Avg Pace (Kschm)";
     private var _lapKschmPaceLabel = "Avg Lap Pace (Kschm)";
+    private var fgColor;
+    private var bgColor;
     
     function initialize() {
+        if (System.getDeviceSettings().requiresBurnInProtection) {
+            fgColor = Graphics.COLOR_WHITE;
+            bgColor = Graphics.COLOR_BLACK;
+        } else {
+            fgColor = Graphics.COLOR_BLACK;
+            bgColor = Graphics.COLOR_WHITE;
+
+        }
         DataField.initialize();
         _fitContributor = new KschmFitContributor(self);
     }
@@ -67,8 +77,6 @@ class KiloschmenzerQuadrantView extends Ui.DataField {
     }
 
     function onUpdate(dc) {
-        var fgColor = Graphics.COLOR_BLACK;
-        var bgColor = Graphics.COLOR_WHITE;
 
         var lapKschm = _fitContributor.lapKschm;
         var lapKschmPace = _fitContributor.lapKschmPace;
@@ -106,12 +114,12 @@ class KiloschmenzerQuadrantView extends Ui.DataField {
 
     //! Handle an activity timer pause
     public function onTimerPause() as Void {
-        _fitContributor.setTimerRunning(false);
+        _fitContributor.onTimerPause();
     }
 
     //! Handle the activity timer resuming
     public function onTimerResume() as Void {
-        _fitContributor.setTimerRunning(true);
+        _fitContributor.onTimerResume();
     }
 
     //! Handle a lap event
